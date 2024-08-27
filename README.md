@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v1.0.1
+
+- no changes
+
 ### v1.0.0
 
 - initial commit
