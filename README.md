@@ -30,9 +30,13 @@ square_database\data\config.ini
 
 ## changelog
 
+### v1.0.2
+
+- database creation logic change
+
 ### v1.0.1
 
-- no changes
+- no changes (password erase from history)
 
 ### v1.0.0
 
