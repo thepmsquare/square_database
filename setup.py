@@ -19,11 +19,11 @@ setup(
         "httpx>=0.26.0",
         "pytest>=8.0.0",
         "square_logger>=1.0.0",
-        "square_commons>=0.0.3",
+        "square_commons>=1.0.0",
     ],
     extras_require={
         "all": [
-            "square_database_structure>=0.0.1",
+            "square_database_structure>=1.0.1",
         ],
     },
     author="thePmSquare",
