@@ -32,14 +32,14 @@ square_database\data\config.ini
 
 ### v1.0.2
 
-- database creation logic change
+- database creation logic change.
 
 ### v1.0.1
 
-- no changes (password erase from history)
+- no changes. (password erase from history.)
 
 ### v1.0.0
 
-- initial commit
+- initial commit.
 
 ## Feedback is appreciated. Thank you!
