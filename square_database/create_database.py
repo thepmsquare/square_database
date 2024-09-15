@@ -1,4 +1,3 @@
-import importlib
 import os
 
 from psycopg2.errors import DuplicateDatabase
@@ -7,7 +6,6 @@ from sqlalchemy.orm import sessionmaker
 
 from square_database.configuration import (
     config_int_db_port,
-    config_str_database_module_name,
     config_str_db_ip,
     config_str_db_password,
     config_str_db_username,
@@ -24,14 +22,10 @@ def create_database_and_tables():
         global_object_square_logger.logger.info(
             f"Creating databases, schemas and tables at database ip: {config_str_db_ip}:{config_int_db_port}."
         )
+        local_list_create = getattr(database_structure_module, "global_list_create")
 
-        local_list_database_names = [
-            f
-            for f in os.listdir(database_module_dirctory)
-            if os.path.isdir(os.path.join(database_module_dirctory, f))
-               and f != "__pycache__"
-        ]
-        for local_str_database_name in local_list_database_names:
+        for local_dict_database in local_list_create:
+            local_str_database_name = local_dict_database["database"]
             local_str_postgres_url = (
                 f"postgresql://{config_str_db_username}:{config_str_db_password}@"
                 f"{config_str_db_ip}:{str(config_int_db_port)}/"
@@ -52,23 +46,14 @@ def create_database_and_tables():
                 else:
                     raise
             # ===========================================
-            schema_folder_name = (
-                    database_module_dirctory + os.sep + local_str_database_name
-            )
-            local_list_schema_names = [
-                f
-                for f in os.listdir(schema_folder_name)
-                if os.path.isdir(os.path.join(schema_folder_name, f))
-                   and f != "__pycache__"
-            ]
-
             local_str_database_url = (
                 f"postgresql://{config_str_db_username}:{config_str_db_password}@"
                 f"{config_str_db_ip}:{str(config_int_db_port)}/{local_str_database_name}"
             )
             database_engine = create_engine(local_str_database_url)
             with database_engine.connect() as database_connection:
-                for local_str_schema_name in local_list_schema_names:
+                for local_dict_schema in local_dict_database["schemas"]:
+                    local_str_schema_name = local_dict_schema["schema"]
                     # Create schema if not exists
                     if not database_engine.dialect.has_schema(
                             database_connection, local_str_schema_name
@@ -91,16 +76,11 @@ def create_database_and_tables():
                         schema=local_str_schema_name
                     )
 
-                    tables_module_path = (
-                        f"{config_str_database_module_name}"
-                        f".{local_str_database_name}.{local_str_schema_name}.tables"
-                    )
-                    tables_module = importlib.import_module(tables_module_path)
-                    base = getattr(tables_module, "Base")
+                    base = local_dict_schema["base"]
                     # Create tables if not exists
                     base.metadata.create_all(database_engine)
                     # ===========================================
-                    data_to_insert = getattr(tables_module, "data_to_insert")
+                    data_to_insert = local_dict_schema["data_to_insert"]
                     local_object_session = sessionmaker(bind=database_engine)
                     session = local_object_session()
                     filtered_data_to_insert = [
