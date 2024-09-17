@@ -126,12 +126,14 @@ async def insert_rows(insert_rows_model: InsertRows):
 @global_object_square_logger.async_auto_logger
 async def get_rows(get_rows_model: GetRows):
     try:
+        # Create the database URL
         local_str_database_url = (
             f"postgresql://{config_str_db_username}:{config_str_db_password}@"
             f"{config_str_db_ip}:{str(config_int_db_port)}/{get_rows_model.database_name}"
         )
         database_engine = create_engine(local_str_database_url)
-        # Connect to database
+
+        # Connect to the database
         with database_engine.connect() as database_connection:
             # ===========================================
             try:
@@ -144,8 +146,10 @@ async def get_rows(get_rows_model: GetRows):
             except OperationalError:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="incorrect schema name.",
+                    detail="Incorrect schema name.",
                 )
+
+            # Dynamically import table module and class
             try:
                 table_class_name = snake_to_capital_camel(get_rows_model.table_name)
                 table_module_path = (
@@ -157,26 +161,53 @@ async def get_rows(get_rows_model: GetRows):
             except Exception:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="incorrect table name.",
+                    detail="Incorrect table name.",
                 )
+
+            # Session management
             local_object_session = sessionmaker(bind=database_engine)
             session = local_object_session()
+
             try:
-                # get rows
+                # Query helper function for order_by
+                def apply_order_by(query, order_by):
+                    if order_by:
+                        order_by_columns = [
+                            (
+                                getattr(table_class, col[1:]).desc()
+                                if col.startswith("-")
+                                else getattr(table_class, col).asc()
+                            )
+                            for col in order_by
+                        ]
+                        query = query.order_by(*order_by_columns)
+                    return query
+
+                # Get rows based on filters
                 if get_rows_model.ignore_filters_and_get_all:
                     query = session.query(table_class)
-                    filtered_rows = query.all()
+                    query = apply_order_by(query, get_rows_model.order_by)
+                    query = query.limit(get_rows_model.limit).offset(
+                        get_rows_model.offset
+                    )
                 else:
                     if not get_rows_model.filters:
-                        query = None
-                        filtered_rows = []
-                    else:
-                        query = session.query(table_class)
-                        for key, value in get_rows_model.filters.items():
-                            query = query.filter(getattr(table_class, key) == value)
+                        return JSONResponse(
+                            status_code=status.HTTP_200_OK,
+                            content=json.loads(json.dumps([], default=str)),
+                        )
+                    query = session.query(table_class)
+                    for key, value in get_rows_model.filters.items():
+                        query = query.filter(getattr(table_class, key) == value)
+                    query = apply_order_by(query, get_rows_model.order_by)
+                    query = query.limit(get_rows_model.limit).offset(
+                        get_rows_model.offset
+                    )
 
-                        filtered_rows = query.all()
-                # ===========================================
+                # Fetch results
+                filtered_rows = query.all()
+
+                # Format results to JSON-serializable format
                 local_list_filtered_rows = [
                     {
                         key: value
@@ -186,23 +217,26 @@ async def get_rows(get_rows_model: GetRows):
                     for x in filtered_rows
                 ]
 
-                session.close()
                 return JSONResponse(
                     status_code=status.HTTP_200_OK,
                     content=json.loads(
                         json.dumps(local_list_filtered_rows, default=str)
                     ),
                 )
+
             except Exception as e:
-                session.close()
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
                 )
-    except HTTPException:
-        raise
+            finally:
+                # Ensure session is closed
+                session.close()
+
+    except HTTPException as e:
+        raise e
     except OperationalError:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="incorrect database name."
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect database name."
         )
     except Exception as e:
         raise HTTPException(
