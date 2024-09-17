@@ -17,7 +17,7 @@ class GetRows(BaseModel):
     filters: dict
     ignore_filters_and_get_all: bool = False
     order_by: list[str] = ()
-    limit: int | None = None
+    limit: int = None
     offset: int = 0
 
 
