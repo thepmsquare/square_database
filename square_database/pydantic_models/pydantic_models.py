@@ -16,7 +16,7 @@ class GetRows(BaseModel):
     schema_name: str
     filters: dict
     ignore_filters_and_get_all: bool = False
-    order_by: list[str] = ()
+    order_by: list[str] = []
     limit: int = None
     offset: int = 0
 
