@@ -448,7 +448,7 @@ if __name__ == "__main__":
         if config_bool_create_schema:
             create_database_and_tables()
         if os.path.exists(config_str_ssl_key_file_path) and os.path.exists(
-                config_str_ssl_crt_file_path
+            config_str_ssl_crt_file_path
         ):
             run(
                 app,
