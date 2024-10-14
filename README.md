@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v1.1.0
+
+- remove table creation logic (move to square_database_structure).
+
 ### v1.0.3
 
 - add limit, offset and order by in get rows.
