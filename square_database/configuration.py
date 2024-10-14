@@ -1,5 +1,4 @@
 import configparser
-import importlib
 import os
 import sys
 
@@ -68,20 +67,3 @@ global_object_square_logger = SquareLogger(
     pstr_log_path=config_str_log_path,
     pint_log_backup_count=config_int_log_backup_count,
 )
-
-# extra logic for this module
-
-try:
-    database_structure_module = importlib.import_module(config_str_database_module_name)
-except Exception as e:
-    print(
-        "\033[91mUnable to import "
-        + config_str_database_module_name
-        + ".\n"
-        + "This package needs a specialized package with the pydantic models of all tables.\n"
-        + "Install it and update config.ini -> `DATABASE_PACKAGE_NAME` to initiate this package.\n"
-        + "Error details: "
-        + str(e)
-        + "\033[0m"
-    )
-    sys.exit()

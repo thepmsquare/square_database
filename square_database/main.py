@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
+from square_database_structure import create_database_and_tables
 from uvicorn import run
 
 from square_database.configuration import (
@@ -25,7 +26,6 @@ from square_database.configuration import (
     config_str_ssl_crt_file_path,
     config_str_ssl_key_file_path,
 )
-from square_database.create_database import create_database_and_tables
 from square_database.pydantic_models.pydantic_models import (
     DeleteRows,
     EditRows,
@@ -446,9 +446,14 @@ async def root():
 if __name__ == "__main__":
     try:
         if config_bool_create_schema:
-            create_database_and_tables()
+            create_database_and_tables(
+                db_username=config_str_db_username,
+                db_port=config_int_db_port,
+                db_password=config_str_db_password,
+                db_ip=config_str_db_ip,
+            )
         if os.path.exists(config_str_ssl_key_file_path) and os.path.exists(
-            config_str_ssl_crt_file_path
+                config_str_ssl_crt_file_path
         ):
             run(
                 app,
