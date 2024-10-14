@@ -11,7 +11,6 @@ setup(
     },
     install_requires=[
         "sqlalchemy>=2.0.23",
-        "psycopg2-binary>=2.9.9",
         "uvicorn>=0.24.0.post1",
         "fastapi>=0.104.1",
         "python-multipart>=0.0.6",
