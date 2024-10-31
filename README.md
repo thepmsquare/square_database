@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.0.0
+
+- append version number for each endpoint in the api.
+
 ### v1.1.0
 
 - remove table creation logic (move to square_database_structure).
