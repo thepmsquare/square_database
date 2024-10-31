@@ -1,38 +1,47 @@
-from typing import List
+from typing import Dict, Any, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, conlist, Field, RootModel
 
 
-class InsertRows(BaseModel):
+class FilterConditionsV0(BaseModel):
+    eq: Any = None  # here default none makes sense only if I have multiple conditions.
+
+
+class FiltersV0(RootModel):
+    root: Dict[str, FilterConditionsV0]
+
+
+class InsertRowsV0(BaseModel):
     database_name: str
     table_name: str
     schema_name: str
-    data: List[dict]
+    data: conlist(Dict[str, Any], min_length=1)
 
 
-class GetRows(BaseModel):
+class GetRowsV0(BaseModel):
     database_name: str
     table_name: str
     schema_name: str
-    filters: dict
-    ignore_filters_and_get_all: bool = False
-    order_by: list[str] = []
-    limit: int = None
+    filters: FiltersV0
+    apply_filters: bool = True
+    columns: Optional[List[str]] = None
+    order_by: List[str] = Field(default_factory=list)
+    limit: Optional[int] = None
     offset: int = 0
 
 
-class EditRows(BaseModel):
+class EditRowsV0(BaseModel):
     database_name: str
     table_name: str
     schema_name: str
-    filters: dict
-    data: dict
-    ignore_filters_and_edit_all: bool = False
+    filters: FiltersV0
+    data: Dict[str, Any]
+    apply_filters: bool = True
 
 
-class DeleteRows(BaseModel):
+class DeleteRowsV0(BaseModel):
     database_name: str
     table_name: str
     schema_name: str
-    filters: dict
-    ignore_filters_and_delete_all: bool = False
+    filters: FiltersV0
+    apply_filters: bool = True

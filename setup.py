@@ -4,7 +4,7 @@ package_name = "square_database"
 
 setup(
     name=package_name,
-    version="2.0.0",
+    version="2.1.0",
     packages=find_packages(),
     package_data={
         package_name: ["data/*", "pydantic_models/*"],
@@ -19,6 +19,7 @@ setup(
         "pytest>=8.0.0",
         "square_logger>=1.0.0",
         "square_commons>=1.0.0",
+        "pydantic>=2.9.2"
     ],
     extras_require={
         "all": [

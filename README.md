@@ -30,6 +30,15 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.1.0
+
+- standardize filter input to forward facing data structure.
+- rename ignore_all to apply_filters.
+- add columns in get rows.
+- stricter type checking in pydantic models.
+- refactor logic to apply filters into common function.
+- add pydantic as explicit requirement.
+
 ### v2.0.0
 
 - append version number for each endpoint in the api.

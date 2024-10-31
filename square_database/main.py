@@ -27,12 +27,12 @@ from square_database.configuration import (
     config_str_ssl_key_file_path,
 )
 from square_database.pydantic_models.pydantic_models import (
-    DeleteRows,
-    EditRows,
-    GetRows,
-    InsertRows,
+    DeleteRowsV0,
+    EditRowsV0,
+    GetRowsV0,
+    InsertRowsV0,
 )
-from square_database.utils.CommonOperations import snake_to_capital_camel
+from square_database.utils.CommonOperations import snake_to_capital_camel, apply_order_by, apply_filters
 
 app = FastAPI()
 
@@ -46,7 +46,7 @@ app.add_middleware(
 
 @app.post("/insert_rows/v0", status_code=status.HTTP_201_CREATED)
 @global_object_square_logger.async_auto_logger
-async def insert_rows_v0(insert_rows_model: InsertRows):
+async def insert_rows_v0(insert_rows_model: InsertRowsV0):
     try:
         local_str_database_url = (
             f"postgresql://{config_str_db_username}:{config_str_db_password}@"
@@ -124,7 +124,7 @@ async def insert_rows_v0(insert_rows_model: InsertRows):
 
 @app.post("/get_rows/v0", status_code=status.HTTP_200_OK)
 @global_object_square_logger.async_auto_logger
-async def get_rows_v0(get_rows_model: GetRows):
+async def get_rows_v0(get_rows_model: GetRowsV0):
     try:
         # Create the database URL
         local_str_database_url = (
@@ -169,40 +169,21 @@ async def get_rows_v0(get_rows_model: GetRows):
             session = local_object_session()
 
             try:
-                # Query helper function for order_by
-                def apply_order_by(query, order_by):
-                    if order_by:
-                        order_by_columns = [
-                            (
-                                getattr(table_class, col[1:]).desc()
-                                if col.startswith("-")
-                                else getattr(table_class, col).asc()
-                            )
-                            for col in order_by
-                        ]
-                        query = query.order_by(*order_by_columns)
-                    return query
 
-                # Get rows based on filters
-                if get_rows_model.ignore_filters_and_get_all:
-                    query = session.query(table_class)
-                    query = apply_order_by(query, get_rows_model.order_by)
-                    query = query.limit(get_rows_model.limit).offset(
-                        get_rows_model.offset
-                    )
-                else:
-                    if not get_rows_model.filters:
+                query = session.query(table_class)
+
+                if get_rows_model.apply_filters:
+                    if not get_rows_model.filters.root:
                         return JSONResponse(
                             status_code=status.HTTP_200_OK,
                             content=json.loads(json.dumps([], default=str)),
                         )
-                    query = session.query(table_class)
-                    for key, value in get_rows_model.filters.items():
-                        query = query.filter(getattr(table_class, key) == value)
-                    query = apply_order_by(query, get_rows_model.order_by)
-                    query = query.limit(get_rows_model.limit).offset(
-                        get_rows_model.offset
-                    )
+
+                    query = apply_filters(query, get_rows_model.filters.root, table_class)
+                query = apply_order_by(query, get_rows_model.order_by, table_class)
+                query = query.limit(get_rows_model.limit).offset(
+                    get_rows_model.offset
+                )
 
                 # Fetch results
                 filtered_rows = query.all()
@@ -246,7 +227,7 @@ async def get_rows_v0(get_rows_model: GetRows):
 
 @app.put("/edit_rows/v0", status_code=status.HTTP_200_OK)
 @global_object_square_logger.async_auto_logger
-async def edit_rows_v0(edit_rows_model: EditRows):
+async def edit_rows_v0(edit_rows_model: EditRowsV0):
     try:
         local_str_database_url = (
             f"postgresql://{config_str_db_username}:{config_str_db_password}@"
@@ -285,19 +266,15 @@ async def edit_rows_v0(edit_rows_model: EditRows):
             session = local_object_session()
             try:
                 # Get rows from filters
-                if edit_rows_model.ignore_filters_and_edit_all:
-                    query = session.query(table_class)
-                    filtered_rows = query.all()
-                else:
-                    if not edit_rows_model.filters:
-                        query = None
+                query = session.query(table_class)
+                if edit_rows_model.apply_filters:
+                    if not edit_rows_model.filters.root:
                         filtered_rows = []
                     else:
-                        query = session.query(table_class)
-                        for key, value in edit_rows_model.filters.items():
-                            query = query.filter(getattr(table_class, key) == value)
-
+                        query = apply_filters(query, edit_rows_model.filters.root, table_class)
                         filtered_rows = query.all()
+                else:
+                    filtered_rows = query.all()
                 # ===========================================
                 for row in filtered_rows:
                     for key, value in edit_rows_model.data.items():
@@ -342,7 +319,7 @@ async def edit_rows_v0(edit_rows_model: EditRows):
 
 @app.delete("/delete_rows/v0", status_code=status.HTTP_200_OK)
 @global_object_square_logger.async_auto_logger
-async def delete_rows_v0(delete_rows_model: DeleteRows):
+async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
     try:
         local_str_database_url = (
             f"postgresql://{config_str_db_username}:{config_str_db_password}@"
@@ -380,20 +357,16 @@ async def delete_rows_v0(delete_rows_model: DeleteRows):
             local_object_session = sessionmaker(bind=database_engine)
             session = local_object_session()
             try:
-                # get rows from filters
-                if delete_rows_model.ignore_filters_and_delete_all:
-                    query = session.query(table_class)
-                    filtered_rows = query.all()
-                else:
-                    if not delete_rows_model.filters:
-                        query = None
+                # Get rows from filters
+                query = session.query(table_class)
+                if delete_rows_model.apply_filters:
+                    if not delete_rows_model.filters.root:
                         filtered_rows = []
                     else:
-                        query = session.query(table_class)
-                        for key, value in delete_rows_model.filters.items():
-                            query = query.filter(getattr(table_class, key) == value)
-
+                        query = apply_filters(query, delete_rows_model.filters.root, table_class)
                         filtered_rows = query.all()
+                else:
+                    filtered_rows = query.all()
                 # ===========================================
                 local_list_filtered_rows = [
                     {
