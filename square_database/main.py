@@ -44,9 +44,9 @@ app.add_middleware(
 )
 
 
-@app.post("/insert_rows", status_code=status.HTTP_201_CREATED)
+@app.post("/insert_rows/v0", status_code=status.HTTP_201_CREATED)
 @global_object_square_logger.async_auto_logger
-async def insert_rows(insert_rows_model: InsertRows):
+async def insert_rows_v0(insert_rows_model: InsertRows):
     try:
         local_str_database_url = (
             f"postgresql://{config_str_db_username}:{config_str_db_password}@"
@@ -122,9 +122,9 @@ async def insert_rows(insert_rows_model: InsertRows):
         )
 
 
-@app.post("/get_rows", status_code=status.HTTP_200_OK)
+@app.post("/get_rows/v0", status_code=status.HTTP_200_OK)
 @global_object_square_logger.async_auto_logger
-async def get_rows(get_rows_model: GetRows):
+async def get_rows_v0(get_rows_model: GetRows):
     try:
         # Create the database URL
         local_str_database_url = (
@@ -244,9 +244,9 @@ async def get_rows(get_rows_model: GetRows):
         )
 
 
-@app.put("/edit_rows", status_code=status.HTTP_200_OK)
+@app.put("/edit_rows/v0", status_code=status.HTTP_200_OK)
 @global_object_square_logger.async_auto_logger
-async def edit_rows(edit_rows_model: EditRows):
+async def edit_rows_v0(edit_rows_model: EditRows):
     try:
         local_str_database_url = (
             f"postgresql://{config_str_db_username}:{config_str_db_password}@"
@@ -340,9 +340,9 @@ async def edit_rows(edit_rows_model: EditRows):
         )
 
 
-@app.delete("/delete_rows", status_code=status.HTTP_200_OK)
+@app.delete("/delete_rows/v0", status_code=status.HTTP_200_OK)
 @global_object_square_logger.async_auto_logger
-async def delete_rows(delete_rows_model: DeleteRows):
+async def delete_rows_v0(delete_rows_model: DeleteRows):
     try:
         local_str_database_url = (
             f"postgresql://{config_str_db_username}:{config_str_db_password}@"
