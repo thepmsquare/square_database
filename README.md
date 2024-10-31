@@ -30,6 +30,14 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.2.0
+
+- standardize output format for all endpoints.
+- edit_rows is not patch method.
+- bug fix in get rows for column selection.
+- added total count in get rows.
+- added affected count in insert, edit, and delete rows.
+
 ### v2.1.0
 
 - standardize filter input to forward facing data structure.
