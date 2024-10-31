@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.2.1
+
+- update test for root
+
 ### v2.2.0
 
 - standardize output format for all endpoints.
