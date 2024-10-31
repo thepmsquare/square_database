@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
+from square_commons import get_api_output_in_standard_format
 from square_database_structure import create_database_and_tables
 from uvicorn import run
 
@@ -21,18 +22,23 @@ from square_database.configuration import (
     config_str_db_password,
     config_str_db_username,
     config_str_host_ip,
-    global_object_square_logger,
     config_str_module_name,
     config_str_ssl_crt_file_path,
     config_str_ssl_key_file_path,
+    global_object_square_logger,
 )
+from square_database.messages import messages
 from square_database.pydantic_models.pydantic_models import (
     DeleteRowsV0,
     EditRowsV0,
     GetRowsV0,
     InsertRowsV0,
 )
-from square_database.utils.CommonOperations import snake_to_capital_camel, apply_order_by, apply_filters
+from square_database.utils.CommonOperations import (
+    apply_filters,
+    apply_order_by,
+    snake_to_capital_camel,
+)
 
 app = FastAPI()
 
@@ -63,10 +69,13 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
                     text(f"SET search_path TO {insert_rows_model.schema_name}")
                 )
                 # ===========================================
-            except OperationalError:
+            except OperationalError as oe:
+                output_content = get_api_output_in_standard_format(
+                    message=messages["INCORRECT_SCHEMA_NAME"], log=str(oe)
+                )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="incorrect schema name.",
+                    detail=output_content,
                 )
             try:
                 table_class_name = snake_to_capital_camel(insert_rows_model.table_name)
@@ -76,10 +85,13 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
                 )
                 table_module = importlib.import_module(table_module_path)
                 table_class = getattr(table_module, table_class_name)
-            except Exception:
+            except Exception as e:
+                output_content = get_api_output_in_standard_format(
+                    message=messages["INCORRECT_TABLE_NAME"], log=str(e)
+                )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="incorrect table name.",
+                    detail=output_content,
                 )
             local_object_session = sessionmaker(bind=database_engine)
             session = local_object_session()
@@ -91,34 +103,52 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
                 session.commit()
                 for ele in data_to_insert:
                     session.refresh(ele)
-                return_this = [
-                    {
-                        key: value
-                        for key, value in new_row.__dict__.items()
-                        if not key.startswith("_")
-                    }
-                    for new_row in data_to_insert
-                ]
+                return_this = json.loads(
+                    json.dumps(
+                        [
+                            {
+                                key: value
+                                for key, value in new_row.__dict__.items()
+                                if not key.startswith("_")
+                            }
+                            for new_row in data_to_insert
+                        ],
+                        default=str,
+                    )
+                )
                 session.close()
+                output_content = get_api_output_in_standard_format(
+                    message=messages["CREATE_SUCCESSFUL"],
+                    data={"main": return_this, "affected_count": len(return_this)},
+                )
                 return JSONResponse(
                     status_code=status.HTTP_201_CREATED,
-                    content=json.loads(json.dumps(return_this, default=str)),
+                    content=output_content,
                 )
             except Exception as e:
                 session.rollback()
                 session.close()
+                output_content = get_api_output_in_standard_format(
+                    message=messages["GENERIC_400"], log=str(e)
+                )
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
                 )
     except HTTPException:
         raise
-    except OperationalError:
+    except OperationalError as oe:
+        output_content = get_api_output_in_standard_format(
+            message=messages["INCORRECT_DATABASE_NAME"], log=str(oe)
+        )
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="incorrect database name."
+            status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
         )
     except Exception as e:
+        output_content = get_api_output_in_standard_format(
+            message=messages["GENERIC_500"], log=str(e)
+        )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=output_content
         )
 
 
@@ -143,10 +173,12 @@ async def get_rows_v0(get_rows_model: GetRowsV0):
                 )
                 # ===========================================
 
-            except OperationalError:
+            except OperationalError as oe:
+                output_content = get_api_output_in_standard_format(
+                    message=messages["INCORRECT_SCHEMA_NAME"], log=str(oe)
+                )
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Incorrect schema name.",
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
                 )
 
             # Dynamically import table module and class
@@ -158,10 +190,13 @@ async def get_rows_v0(get_rows_model: GetRowsV0):
                 )
                 table_module = importlib.import_module(table_module_path)
                 table_class = getattr(table_module, table_class_name)
-            except Exception:
+            except Exception as e:
+                output_content = get_api_output_in_standard_format(
+                    message=messages["INCORRECT_TABLE_NAME"], log=str(e)
+                )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Incorrect table name.",
+                    detail=output_content,
                 )
 
             # Session management
@@ -174,40 +209,59 @@ async def get_rows_v0(get_rows_model: GetRowsV0):
 
                 if get_rows_model.apply_filters:
                     if not get_rows_model.filters.root:
+                        output_content = get_api_output_in_standard_format(
+                            data={"main": [], "total_count": 0},
+                            message=messages["GENERIC_204"],
+                        )
                         return JSONResponse(
                             status_code=status.HTTP_200_OK,
-                            content=json.loads(json.dumps([], default=str)),
+                            content=output_content,
                         )
 
-                    query = apply_filters(query, get_rows_model.filters.root, table_class)
+                    query = apply_filters(
+                        query, get_rows_model.filters.root, table_class
+                    )
+                # Count
+                total_count = query.count()
                 query = apply_order_by(query, get_rows_model.order_by, table_class)
-                query = query.limit(get_rows_model.limit).offset(
-                    get_rows_model.offset
-                )
+                query = query.limit(get_rows_model.limit).offset(get_rows_model.offset)
 
                 # Fetch results
                 filtered_rows = query.all()
 
                 # Format results to JSON-serializable format
+                # column filtering logic added manually
                 local_list_filtered_rows = [
                     {
                         key: value
                         for key, value in x.__dict__.items()
                         if not key.startswith("_")
+                        and (
+                            not get_rows_model.columns or key in get_rows_model.columns
+                        )
                     }
                     for x in filtered_rows
                 ]
-
+                output_content = get_api_output_in_standard_format(
+                    message=messages["READ_SUCCESSFUL"],
+                    data={
+                        "main": json.loads(
+                            json.dumps(local_list_filtered_rows, default=str)
+                        ),
+                        "total_count": total_count,
+                    },
+                )
                 return JSONResponse(
                     status_code=status.HTTP_200_OK,
-                    content=json.loads(
-                        json.dumps(local_list_filtered_rows, default=str)
-                    ),
+                    content=output_content,
                 )
 
             except Exception as e:
+                output_content = get_api_output_in_standard_format(
+                    message=messages["GENERIC_400"], log=str(e)
+                )
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
                 )
             finally:
                 # Ensure session is closed
@@ -215,17 +269,23 @@ async def get_rows_v0(get_rows_model: GetRowsV0):
 
     except HTTPException as e:
         raise e
-    except OperationalError:
+    except OperationalError as oe:
+        output_content = get_api_output_in_standard_format(
+            message=messages["INCORRECT_DATABASE_NAME"], log=str(oe)
+        )
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect database name."
+            status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
         )
     except Exception as e:
+        output_content = get_api_output_in_standard_format(
+            message=messages["GENERIC_500"], log=str(e)
+        )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=output_content
         )
 
 
-@app.put("/edit_rows/v0", status_code=status.HTTP_200_OK)
+@app.patch("/edit_rows/v0", status_code=status.HTTP_200_OK)
 @global_object_square_logger.async_auto_logger
 async def edit_rows_v0(edit_rows_model: EditRowsV0):
     try:
@@ -244,10 +304,13 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
                 )
                 # ===========================================
 
-            except OperationalError:
+            except OperationalError as oe:
+                output_content = get_api_output_in_standard_format(
+                    message=messages["INCORRECT_SCHEMA_NAME"], log=str(oe)
+                )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="incorrect schema name.",
+                    detail=output_content,
                 )
             try:
                 table_class_name = snake_to_capital_camel(edit_rows_model.table_name)
@@ -257,10 +320,13 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
                 )
                 table_module = importlib.import_module(table_module_path)
                 table_class = getattr(table_module, table_class_name)
-            except Exception:
+            except Exception as e:
+                output_content = get_api_output_in_standard_format(
+                    message=messages["INCORRECT_TABLE_NAME"], log=str(e)
+                )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="incorrect table name.",
+                    detail=output_content,
                 )
             local_object_session = sessionmaker(bind=database_engine)
             session = local_object_session()
@@ -271,7 +337,9 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
                     if not edit_rows_model.filters.root:
                         filtered_rows = []
                     else:
-                        query = apply_filters(query, edit_rows_model.filters.root, table_class)
+                        query = apply_filters(
+                            query, edit_rows_model.filters.root, table_class
+                        )
                         filtered_rows = query.all()
                 else:
                     filtered_rows = query.all()
@@ -293,27 +361,43 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
                     for x in filtered_rows
                 ]
                 session.close()
+                return_this = json.loads(
+                    json.dumps(local_list_filtered_rows, default=str)
+                )
+                output_content = get_api_output_in_standard_format(
+                    message=messages["UPDATE_SUCCESSFUL"],
+                    data={
+                        "main": return_this,
+                        "affected_count": len(return_this),
+                    },
+                )
                 return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content=json.loads(
-                        json.dumps(local_list_filtered_rows, default=str)
-                    ),
+                    status_code=status.HTTP_200_OK, content=output_content
                 )
             except Exception as e:
                 session.rollback()
                 session.close()
+                output_content = get_api_output_in_standard_format(
+                    message=messages["GENERIC_400"], log=str(e)
+                )
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
                 )
     except HTTPException:
         raise
-    except OperationalError:
+    except OperationalError as oe:
+        output_content = get_api_output_in_standard_format(
+            message=messages["INCORRECT_DATABASE_NAME"], log=str(oe)
+        )
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="incorrect database name."
+            status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
         )
     except Exception as e:
+        output_content = get_api_output_in_standard_format(
+            message=messages["GENERIC_500"], log=str(e)
+        )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=output_content
         )
 
 
@@ -336,10 +420,13 @@ async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
                 )
                 # ===========================================
 
-            except OperationalError:
+            except OperationalError as oe:
+                output_content = get_api_output_in_standard_format(
+                    message=messages["INCORRECT_SCHEMA_NAME"], log=str(oe)
+                )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="incorrect schema name.",
+                    detail=output_content,
                 )
             try:
                 table_class_name = snake_to_capital_camel(delete_rows_model.table_name)
@@ -349,11 +436,15 @@ async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
                 )
                 table_module = importlib.import_module(table_module_path)
                 table_class = getattr(table_module, table_class_name)
-            except Exception:
+            except Exception as e:
+                output_content = get_api_output_in_standard_format(
+                    message=messages["INCORRECT_TABLE_NAME"], log=str(e)
+                )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="incorrect table name.",
+                    detail=output_content,
                 )
+
             local_object_session = sessionmaker(bind=database_engine)
             session = local_object_session()
             try:
@@ -363,7 +454,9 @@ async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
                     if not delete_rows_model.filters.root:
                         filtered_rows = []
                     else:
-                        query = apply_filters(query, delete_rows_model.filters.root, table_class)
+                        query = apply_filters(
+                            query, delete_rows_model.filters.root, table_class
+                        )
                         filtered_rows = query.all()
                 else:
                     filtered_rows = query.all()
@@ -382,29 +475,42 @@ async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
                 # ===========================================
                 session.commit()
                 session.close()
+                return_this = json.loads(
+                    json.dumps(local_list_filtered_rows, default=str)
+                )
+                output_content = get_api_output_in_standard_format(
+                    message=messages["DELETE_SUCCESSFUL"],
+                    data={"main": return_this, "affected_count": len(return_this)},
+                )
                 return JSONResponse(
-                    status_code=status.HTTP_200_OK,
-                    content=json.loads(
-                        json.dumps(local_list_filtered_rows, default=str)
-                    ),
+                    status_code=status.HTTP_200_OK, content=output_content
                 )
             except Exception as e:
                 # no need for this but kept it anyway :/
                 session.rollback()
                 session.close()
+                output_content = get_api_output_in_standard_format(
+                    message=messages["GENERIC_400"], log=str(e)
+                )
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
                 )
 
     except HTTPException:
         raise
-    except OperationalError:
+    except OperationalError as oe:
+        output_content = get_api_output_in_standard_format(
+            message=messages["INCORRECT_DATABASE_NAME"], log=str(oe)
+        )
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="incorrect database name."
+            status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
         )
     except Exception as e:
+        output_content = get_api_output_in_standard_format(
+            message=messages["GENERIC_500"], log=str(e)
+        )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=output_content
         )
 
 
@@ -412,7 +518,8 @@ async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
 @global_object_square_logger.async_auto_logger
 async def root():
     return JSONResponse(
-        status_code=status.HTTP_200_OK, content={"text": config_str_module_name}
+        status_code=status.HTTP_200_OK,
+        content=get_api_output_in_standard_format(log=config_str_module_name),
     )
 
 
@@ -426,7 +533,7 @@ if __name__ == "__main__":
                 db_ip=config_str_db_ip,
             )
         if os.path.exists(config_str_ssl_key_file_path) and os.path.exists(
-                config_str_ssl_crt_file_path
+            config_str_ssl_crt_file_path
         ):
             run(
                 app,
