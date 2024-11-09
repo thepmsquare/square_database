@@ -4,7 +4,14 @@ from pydantic import BaseModel, conlist, Field, RootModel
 
 
 class FilterConditionsV0(BaseModel):
-    eq: Any = None  # here default none makes sense only if I have multiple conditions.
+    eq: Optional[Any] = None
+    ne: Optional[Any] = None
+    lt: Optional[Any] = None
+    lte: Optional[Any] = None
+    gt: Optional[Any] = None
+    gte: Optional[Any] = None
+    like: Optional[str] = None
+    in_: Optional[List[Any]] = None
 
 
 class FiltersV0(RootModel):

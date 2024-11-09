@@ -29,8 +29,26 @@ def apply_order_by(query, order_by, table_class):
 def apply_filters(query, filters_root, table_class):
     try:
         for key, condition in filters_root.items():
+            column = getattr(table_class, key, None)
+            if not column:
+                raise Exception(f"Invalid Column: {key}")
+
             if condition.eq is not None:
-                query = query.where(getattr(table_class, key) == condition.eq)
+                query = query.where(column == condition.eq)
+            elif condition.ne is not None:
+                query = query.where(column != condition.ne)
+            elif condition.lt is not None:
+                query = query.where(column < condition.lt)
+            elif condition.lte is not None:
+                query = query.where(column <= condition.lte)
+            elif condition.gt is not None:
+                query = query.where(column > condition.gt)
+            elif condition.gte is not None:
+                query = query.where(column >= condition.gte)
+            elif condition.like is not None:
+                query = query.where(column.like(condition.like))
+            elif condition.in_ is not None:
+                query = query.where(column.in_(condition.in_))
         return query
     except Exception:
         raise

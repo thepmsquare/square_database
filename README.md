@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.3.0
+
+- expanded apply_filters to support additional conditions: ne, lt, lte, gt, gte, like, in_.
+
 ### v2.2.1
 
 - update test for root
