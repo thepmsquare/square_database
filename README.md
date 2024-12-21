@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.4.0
+
+- set allow_credentials=True.
+
 ### v2.3.0
 
 - expanded apply_filters to support additional conditions: ne, lt, lte, gt, gte, like, in_.
