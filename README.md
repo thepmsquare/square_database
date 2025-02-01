@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.5.0
+
+- add Dockerfile
+
 ### v2.4.0
 
 - set allow_credentials=True.
