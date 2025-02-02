@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.5.1
+
+- fix github workflow for marking latest image on release.
+
 ### v2.5.0
 
 - add Dockerfile

@@ -2,7 +2,7 @@ name: Build and Deploy Docker Image
 
 on:
   release:
-    types: [published]
+    types: [ published ]
   workflow_dispatch:
     inputs:
       release_tag:
@@ -28,7 +28,12 @@ jobs:
             echo "Release triggered with tag: ${{ github.event.release.tag_name }}"
             echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
             # Automatically tag as latest during a release event if needed
-            echo "IS_LATEST=${{ github.event.release.is_latest }}" >> $GITHUB_ENV
+            LATEST_TAG=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+            if [[ "${{ github.event.release.tag_name }}" == "$LATEST_TAG" ]]; then
+              echo "IS_LATEST=true" >> $GITHUB_ENV
+            else
+              echo "IS_LATEST=false" >> $GITHUB_ENV
+            fi
           else
             echo "Manual trigger with user input tag: ${{ github.event.inputs.release_tag }}"
             echo "RELEASE_TAG=${{ github.event.inputs.release_tag }}" >> $GITHUB_ENV
