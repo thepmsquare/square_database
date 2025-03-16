@@ -156,6 +156,7 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
         )
 
 
+
 @app.post("/get_rows/v0", status_code=status.HTTP_200_OK)
 @global_object_square_logger.async_auto_logger
 async def get_rows_v0(get_rows_model: GetRowsV0):
