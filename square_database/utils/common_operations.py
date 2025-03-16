@@ -1,3 +1,7 @@
+from square_database.configuration import global_object_square_logger
+
+
+@global_object_square_logger.auto_logger
 def snake_to_capital_camel(snake_str):
     try:
         components = snake_str.split("_")
@@ -8,7 +12,7 @@ def snake_to_capital_camel(snake_str):
         raise
 
 
-# Query helper function for order_by
+@global_object_square_logger.auto_logger
 def apply_order_by(query, order_by, table_class):
     try:
         if order_by:
@@ -26,6 +30,7 @@ def apply_order_by(query, order_by, table_class):
         raise
 
 
+@global_object_square_logger.auto_logger
 def apply_filters(query, filters_root, table_class):
     try:
         for key, condition in filters_root.items():

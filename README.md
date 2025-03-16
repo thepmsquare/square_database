@@ -30,6 +30,11 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.5.2
+
+- add logging decorators for all functions.
+- add error logs in all endpoints.
+
 ### v2.5.1
 
 - fix github workflow for marking latest image on release.

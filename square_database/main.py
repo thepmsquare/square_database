@@ -34,7 +34,7 @@ from square_database.pydantic_models.pydantic_models import (
     GetRowsV0,
     InsertRowsV0,
 )
-from square_database.utils.CommonOperations import (
+from square_database.utils.common_operations import (
     apply_filters,
     apply_order_by,
     snake_to_capital_camel,
@@ -135,21 +135,24 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
                 )
-    except HTTPException:
-        raise
     except OperationalError as oe:
+        global_object_square_logger.logger.error(oe, exc_info=True)
         output_content = get_api_output_in_standard_format(
             message=messages["INCORRECT_DATABASE_NAME"], log=str(oe)
         )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content=output_content
         )
+    except HTTPException as he:
+        global_object_square_logger.logger.error(he, exc_info=True)
+        return JSONResponse(status_code=he.status_code, content=he.detail)
     except Exception as e:
+        global_object_square_logger.logger.error(e, exc_info=True)
         output_content = get_api_output_in_standard_format(
             message=messages["GENERIC_500"], log=str(e)
         )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=output_content
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=output_content
         )
 
 
@@ -267,22 +270,24 @@ async def get_rows_v0(get_rows_model: GetRowsV0):
             finally:
                 # Ensure session is closed
                 session.close()
-
-    except HTTPException as e:
-        raise e
     except OperationalError as oe:
+        global_object_square_logger.logger.error(oe, exc_info=True)
         output_content = get_api_output_in_standard_format(
             message=messages["INCORRECT_DATABASE_NAME"], log=str(oe)
         )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content=output_content
         )
+    except HTTPException as he:
+        global_object_square_logger.logger.error(he, exc_info=True)
+        return JSONResponse(status_code=he.status_code, content=he.detail)
     except Exception as e:
+        global_object_square_logger.logger.error(e, exc_info=True)
         output_content = get_api_output_in_standard_format(
             message=messages["GENERIC_500"], log=str(e)
         )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=output_content
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=output_content
         )
 
 
@@ -384,21 +389,24 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
                 )
-    except HTTPException:
-        raise
     except OperationalError as oe:
+        global_object_square_logger.logger.error(oe, exc_info=True)
         output_content = get_api_output_in_standard_format(
             message=messages["INCORRECT_DATABASE_NAME"], log=str(oe)
         )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content=output_content
         )
+    except HTTPException as he:
+        global_object_square_logger.logger.error(he, exc_info=True)
+        return JSONResponse(status_code=he.status_code, content=he.detail)
     except Exception as e:
+        global_object_square_logger.logger.error(e, exc_info=True)
         output_content = get_api_output_in_standard_format(
             message=messages["GENERIC_500"], log=str(e)
         )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=output_content
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=output_content
         )
 
 
@@ -497,21 +505,24 @@ async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
                     status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
                 )
 
-    except HTTPException:
-        raise
     except OperationalError as oe:
+        global_object_square_logger.logger.error(oe, exc_info=True)
         output_content = get_api_output_in_standard_format(
             message=messages["INCORRECT_DATABASE_NAME"], log=str(oe)
         )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content=output_content
         )
+    except HTTPException as he:
+        global_object_square_logger.logger.error(he, exc_info=True)
+        return JSONResponse(status_code=he.status_code, content=he.detail)
     except Exception as e:
+        global_object_square_logger.logger.error(e, exc_info=True)
         output_content = get_api_output_in_standard_format(
             message=messages["GENERIC_500"], log=str(e)
         )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=output_content
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=output_content
         )
 
 
