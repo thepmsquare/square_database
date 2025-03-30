@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.5.3
+
+- bump square_database_structure to >=2.3.1.
+
 ### v2.5.2
 
 - add logging decorators for all functions.
