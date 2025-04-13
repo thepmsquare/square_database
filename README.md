@@ -30,6 +30,13 @@ square_database\data\config.ini
 
 ## changelog
 
+### v2.6.0
+
+- add config.testing.ini for testing.
+- add fixtures get_patched_configuration and create_client_and_cleanup.
+- add test for insert rows.
+- add test for get rows.
+
 ### v2.5.3
 
 - bump square_database_structure to >=2.3.1.
