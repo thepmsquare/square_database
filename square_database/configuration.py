@@ -7,12 +7,8 @@ from square_logger import SquareLogger
 
 try:
     config = configparser.ConfigParser()
-    config_file_path = (
-        os.path.dirname(os.path.abspath(__file__))
-        + os.sep
-        + "data"
-        + os.sep
-        + "config.ini"
+    config_file_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "data", "config.ini"
     )
     ldict_configuration = ConfigReader(config_file_path).read_configuration()
 
