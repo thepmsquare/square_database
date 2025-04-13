@@ -36,6 +36,7 @@ square_database\data\config.ini
 - add fixtures get_patched_configuration and create_client_and_cleanup.
 - add test for insert rows.
 - add test for get rows.
+- bump square_logger >= 2.0.0.
 
 ### v2.5.3
 

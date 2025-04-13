@@ -17,7 +17,7 @@ setup(
         "websockets>=12.0",
         "httpx>=0.26.0",
         "pytest>=8.0.0",
-        "square_logger>=1.0.0",
+        "square_logger>=2.0.0",
         "square_commons>=1.1.0",
         "pydantic>=2.9.2",
     ],

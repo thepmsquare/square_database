@@ -49,6 +49,9 @@ try:
     config_int_log_backup_count = int(
         ldict_configuration["SQUARE_LOGGER"]["LOG_BACKUP_COUNT"]
     )
+    config_bool_enable_redaction = eval(
+        ldict_configuration["SQUARE_LOGGER"]["ENABLE_REDACTION"]
+    )
     # ===========================================
 except Exception as e:
     print(
@@ -62,4 +65,5 @@ global_object_square_logger = SquareLogger(
     pint_log_level=config_int_log_level,
     pstr_log_path=config_str_log_path,
     pint_log_backup_count=config_int_log_backup_count,
+    pbool_enable_redaction=config_bool_enable_redaction,
 )

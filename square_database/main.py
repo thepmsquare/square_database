@@ -52,7 +52,7 @@ app.add_middleware(
 
 
 @app.post("/insert_rows/v0", status_code=status.HTTP_201_CREATED)
-@global_object_square_logger.async_auto_logger
+@global_object_square_logger.auto_logger()
 async def insert_rows_v0(insert_rows_model: InsertRowsV0):
     try:
         local_str_database_url = (
@@ -156,9 +156,8 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
         )
 
 
-
 @app.post("/get_rows/v0", status_code=status.HTTP_200_OK)
-@global_object_square_logger.async_auto_logger
+@global_object_square_logger.auto_logger()
 async def get_rows_v0(get_rows_model: GetRowsV0):
     try:
         # Create the database URL
@@ -293,7 +292,7 @@ async def get_rows_v0(get_rows_model: GetRowsV0):
 
 
 @app.patch("/edit_rows/v0", status_code=status.HTTP_200_OK)
-@global_object_square_logger.async_auto_logger
+@global_object_square_logger.auto_logger()
 async def edit_rows_v0(edit_rows_model: EditRowsV0):
     try:
         local_str_database_url = (
@@ -412,7 +411,7 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
 
 
 @app.delete("/delete_rows/v0", status_code=status.HTTP_200_OK)
-@global_object_square_logger.async_auto_logger
+@global_object_square_logger.auto_logger()
 async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
     try:
         local_str_database_url = (
@@ -528,7 +527,7 @@ async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
 
 
 @app.get("/")
-@global_object_square_logger.async_auto_logger
+@global_object_square_logger.auto_logger()
 async def root():
     return JSONResponse(
         status_code=status.HTTP_200_OK,
