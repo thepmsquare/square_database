@@ -410,7 +410,7 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
         )
 
 
-@app.delete("/delete_rows/v0", status_code=status.HTTP_200_OK)
+@app.post("/delete_rows/v0", status_code=status.HTTP_200_OK)
 @global_object_square_logger.auto_logger()
 async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
     try:

@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.0.0
+
+- /delete_rows/v0 is now POST instead of DELETE.
+
 ### v2.6.0
 
 - add config.testing.ini for testing.
