@@ -20,6 +20,7 @@ setup(
         "square_logger>=2.0.0",
         "square_commons>=1.1.0",
         "pydantic>=2.9.2",
+        "httpx>=0.27.2",
     ],
     extras_require={
         "all": [
