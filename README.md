@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.0.1 (inprogress)
+
+- bugfix in conftest, dyanamic loading of config_str_database_module_name instead of square_database_structure.
+
 ### v3.0.0
 
 - /delete_rows/v0 is now POST instead of DELETE.

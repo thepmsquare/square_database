@@ -28,7 +28,11 @@ def get_patched_configuration(monkeypatch, tmp_path):
 
 @pytest.fixture
 def create_client_and_cleanup(get_patched_configuration):
-    from square_database_structure import create_database_and_tables
+
+    create_database_and_tables = importlib.import_module(
+        get_patched_configuration.config_str_database_module_name
+    ).create_database_and_tables
+
     from square_database.main import (
         app,
     )
@@ -42,7 +46,10 @@ def create_client_and_cleanup(get_patched_configuration):
     client = TestClient(app)
     yield client
     from sqlalchemy import text, create_engine
-    from square_database_structure.main import global_list_create
+
+    global_list_create = importlib.import_module(
+        get_patched_configuration.config_str_database_module_name
+    ).main.global_list_create
 
     local_str_postgres_url = (
         f"postgresql://{get_patched_configuration.config_str_db_username}:{get_patched_configuration.config_str_db_password}@"
