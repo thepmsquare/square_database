@@ -33,6 +33,7 @@ square_database\data\config.ini
 ### v3.0.1 (inprogress)
 
 - bugfix in conftest, dyanamic loading of config_str_database_module_name instead of square_database_structure.
+- update get_patched_configuration and create_client_and_cleanup to be session scoped.
 
 ### v3.0.0
 

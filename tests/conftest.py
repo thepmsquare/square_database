@@ -5,28 +5,30 @@ import pytest
 from fastapi.testclient import TestClient
 
 
-def patched_join(*args):
+@pytest.fixture(scope="session")
+def get_patched_configuration():
+    def patched_join(*args):
+        *rest, last = args
+        if last == "config.ini":
+            last = "config.testing.ini"
 
-    *rest, last = args
-    if last == "config.ini":
-        last = "config.testing.ini"
+        return original_join(*rest, last)
 
-    return original_join(*rest, last)
+    original_join = os.path.join
+    os.path.join = patched_join
 
-
-original_join = os.path.join
-
-
-@pytest.fixture
-def get_patched_configuration(monkeypatch, tmp_path):
     import square_database.configuration
 
-    monkeypatch.setattr(os.path, "join", patched_join)
     importlib.reload(square_database.configuration)
-    return square_database.configuration
+    config = square_database.configuration
+
+    yield config
+
+    # cleanup
+    os.path.join = original_join
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def create_client_and_cleanup(get_patched_configuration):
 
     create_database_and_tables = importlib.import_module(
@@ -67,3 +69,59 @@ def create_client_and_cleanup(get_patched_configuration):
             postgres_connection.execute(
                 text(f"DROP DATABASE {database['database']} WITH (FORCE)")
             )
+
+
+@pytest.fixture()
+def fixture_insert_rows(create_client_and_cleanup):
+    client = create_client_and_cleanup
+    yield {
+        "database_name": "square",
+        "schema_name": "public",
+        "table_name": "test",
+        "data": [
+            {"test_text": "example"},
+        ],
+    }
+    client.post(
+        "/delete_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "filters": {},
+            "apply_filters": False,
+        },
+    )
+
+
+@pytest.fixture()
+def fixture_get_rows(create_client_and_cleanup):
+    client = create_client_and_cleanup
+    client.post(
+        "/insert_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "data": [
+                {"test_text": "example"},
+            ],
+        },
+    )
+    yield {
+        "database_name": "square",
+        "schema_name": "public",
+        "table_name": "test",
+        "filters": {},
+        "apply_filters": False,
+    }
+    client.post(
+        "/delete_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "filters": {},
+            "apply_filters": False,
+        },
+    )
