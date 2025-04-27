@@ -35,16 +35,16 @@ def create_client_and_cleanup(get_patched_configuration):
         get_patched_configuration.config_str_database_module_name
     ).create_database_and_tables
 
-    from square_database.main import (
-        app,
-    )
-
     create_database_and_tables(
         db_username=get_patched_configuration.config_str_db_username,
         db_port=get_patched_configuration.config_int_db_port,
         db_password=get_patched_configuration.config_str_db_password,
         db_ip=get_patched_configuration.config_str_db_ip,
     )
+    from square_database.main import (
+        app,
+    )
+
     client = TestClient(app)
     yield client
     from sqlalchemy import text, create_engine
