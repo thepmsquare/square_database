@@ -26,6 +26,7 @@ from square_database.configuration import (
     config_str_ssl_crt_file_path,
     config_str_ssl_key_file_path,
     global_object_square_logger,
+    config_list_allow_origins,
 )
 from square_database.messages import messages
 from square_database.pydantic_models.pydantic_models import (
@@ -45,7 +46,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
+    allow_origins=config_list_allow_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

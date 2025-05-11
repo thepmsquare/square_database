@@ -30,11 +30,13 @@ square_database\data\config.ini
 
 ## changelog
 
-### v3.0.1 (inprogress)
+### v3.0.1
 
 - testing
     - bugfix in conftest, dyanamic loading of config_str_database_module_name instead of square_database_structure.
     - update get_patched_configuration and create_client_and_cleanup to be session scoped.
+- env
+    - add ALLOW_ORIGINS
 
 ### v3.0.0
 

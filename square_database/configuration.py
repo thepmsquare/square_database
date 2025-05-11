@@ -24,6 +24,9 @@ try:
     config_int_host_port = int(ldict_configuration["ENVIRONMENT"]["HOST_PORT"])
     config_str_db_ip = ldict_configuration["ENVIRONMENT"]["DB_IP"]
     config_int_db_port = int(ldict_configuration["ENVIRONMENT"]["DB_PORT"])
+    config_list_allow_origins = eval(
+        ldict_configuration["ENVIRONMENT"]["ALLOW_ORIGINS"]
+    )
     config_str_db_username = ldict_configuration["ENVIRONMENT"]["DB_USERNAME"]
     config_str_db_password = ldict_configuration["ENVIRONMENT"]["DB_PASSWORD"]
     config_str_log_file_name = ldict_configuration["ENVIRONMENT"]["LOG_FILE_NAME"]
