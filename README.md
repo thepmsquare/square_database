@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.0.4
+
+- add enum_fallback_serializer.
+
 ### v3.0.3
 
 - bump square_database_structure to >=2.5.2.

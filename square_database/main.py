@@ -1,6 +1,7 @@
 import importlib
 import json
 import os.path
+from enum import Enum
 
 from fastapi import FastAPI, status
 from fastapi.exceptions import HTTPException
@@ -50,6 +51,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def enum_fallback_serializer(obj):
+    if isinstance(obj, Enum):
+        return obj.value
+    return str(obj)
 
 
 @app.post("/insert_rows/v0", status_code=status.HTTP_201_CREATED)
@@ -115,7 +122,7 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
                             }
                             for new_row in data_to_insert
                         ],
-                        default=str,
+                        default=enum_fallback_serializer,
                     )
                 )
                 session.close()
@@ -251,7 +258,10 @@ async def get_rows_v0(get_rows_model: GetRowsV0):
                     message=messages["READ_SUCCESSFUL"],
                     data={
                         "main": json.loads(
-                            json.dumps(local_list_filtered_rows, default=str)
+                            json.dumps(
+                                local_list_filtered_rows,
+                                default=enum_fallback_serializer,
+                            )
                         ),
                         "total_count": total_count,
                     },
@@ -369,7 +379,9 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
                 ]
                 session.close()
                 return_this = json.loads(
-                    json.dumps(local_list_filtered_rows, default=str)
+                    json.dumps(
+                        local_list_filtered_rows, default=enum_fallback_serializer
+                    )
                 )
                 output_content = get_api_output_in_standard_format(
                     message=messages["UPDATE_SUCCESSFUL"],
@@ -486,7 +498,9 @@ async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
                 session.commit()
                 session.close()
                 return_this = json.loads(
-                    json.dumps(local_list_filtered_rows, default=str)
+                    json.dumps(
+                        local_list_filtered_rows, default=enum_fallback_serializer
+                    )
                 )
                 output_content = get_api_output_in_standard_format(
                     message=messages["DELETE_SUCCESSFUL"],
