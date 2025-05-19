@@ -125,3 +125,28 @@ def fixture_get_rows(create_client_and_cleanup):
             "apply_filters": False,
         },
     )
+
+
+@pytest.fixture()
+def fixture_duplicate_insert_rows(create_client_and_cleanup):
+    client = create_client_and_cleanup
+    yield {
+        "database_name": "square",
+        "schema_name": "public",
+        "table_name": "test",
+        "data": [
+            {"test_text": "example"},
+            {"test_text": "example"},
+        ],
+        "skip_conflicts": True,
+    }
+    client.post(
+        "/delete_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "filters": {},
+            "apply_filters": False,
+        },
+    )

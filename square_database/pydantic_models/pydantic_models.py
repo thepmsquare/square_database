@@ -23,6 +23,7 @@ class InsertRowsV0(BaseModel):
     table_name: str
     schema_name: str
     data: conlist(Dict[str, Any], min_length=1)
+    skip_conflicts: bool = False
 
 
 class GetRowsV0(BaseModel):

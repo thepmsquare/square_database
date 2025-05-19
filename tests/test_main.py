@@ -51,3 +51,20 @@ def test_get_rows(create_client_and_cleanup, fixture_get_rows):
     assert response_json["data"]["total_count"] == 1
     assert "log" in response_json
     assert "message" in response_json
+
+
+def test_duplicate_insert_rows(
+    create_client_and_cleanup, fixture_duplicate_insert_rows
+):
+    client = create_client_and_cleanup
+    response = client.post("/insert_rows/v0", json=fixture_duplicate_insert_rows)
+    assert response.status_code == 201
+    response_json = response.json()
+    assert "data" in response_json
+    assert "main" in response_json["data"]
+    assert "affected_count" in response_json["data"]
+    assert len(response_json["data"]["main"]) == 1
+    assert response_json["data"]["main"][0]["test_text"] == "example"
+    assert response_json["data"]["affected_count"] == 1
+    assert "log" in response_json
+    assert "message" in response_json

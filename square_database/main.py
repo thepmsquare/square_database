@@ -8,6 +8,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import create_engine, text
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from square_commons import get_api_output_in_standard_format
@@ -105,22 +106,32 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
             local_object_session = sessionmaker(bind=database_engine)
             session = local_object_session()
             try:
-                data_to_insert = [
-                    table_class(**row_dict) for row_dict in insert_rows_model.data
-                ]
-                session.add_all(data_to_insert)
+                if insert_rows_model.skip_conflicts:
+                    stmt = (
+                        insert(table_class)
+                        .values(insert_rows_model.data)
+                        .on_conflict_do_nothing()
+                        .returning(*table_class.__table__.columns)
+                    )
+                else:
+                    stmt = (
+                        insert(table_class)
+                        .values(insert_rows_model.data)
+                        .returning(*table_class.__table__.columns)
+                    )
+
+                result = session.execute(stmt)
+                inserted_rows = result.fetchall()
                 session.commit()
-                for ele in data_to_insert:
-                    session.refresh(ele)
                 return_this = json.loads(
                     json.dumps(
                         [
                             {
                                 key: value
-                                for key, value in new_row.__dict__.items()
-                                if not key.startswith("_")
+                                for key, value in row._asdict().items()
+                                if not key.startswith("_sa_")
                             }
-                            for new_row in data_to_insert
+                            for row in inserted_rows
                         ],
                         default=enum_fallback_serializer,
                     )

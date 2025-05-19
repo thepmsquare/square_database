@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.1.0
+
+- add optional skip_conflicts flag to insert_rows.
+
 ### v3.0.4
 
 - add enum_fallback_serializer.
