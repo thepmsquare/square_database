@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.1.1
+
+- remove config.ini and config.testing.ini from version control.
+
 ### v3.1.0
 
 - add optional skip_conflicts flag to insert_rows.
