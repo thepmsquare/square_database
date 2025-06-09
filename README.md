@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.1.2
+
+- bump square_database_structure to >=2.5.4.
+
 ### v3.1.1
 
 - remove config.ini and config.testing.ini from version control.
