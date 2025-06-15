@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.1.4
+
+- bump square_database_structure to >=2.5.6.
+
 ### v3.1.3
 
 - bump square_database_structure to >=2.5.5.

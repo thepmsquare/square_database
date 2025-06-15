@@ -23,7 +23,7 @@ setup(
     ],
     extras_require={
         "all": [
-            "square_database_structure>=2.5.5",
+            "square_database_structure>=2.5.6",
         ],
     },
     author="thePmSquare",
