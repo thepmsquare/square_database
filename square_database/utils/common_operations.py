@@ -54,6 +54,11 @@ def apply_filters(query, filters_root, table_class):
                 query = query.where(column.like(condition.like))
             elif condition.in_ is not None:
                 query = query.where(column.in_(condition.in_))
+            elif condition.is_null is not None:
+                if condition.is_null:
+                    query = query.where(column.is_(None))
+                else:
+                    query = query.where(column.is_not(None))
         return query
     except Exception:
         raise

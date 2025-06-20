@@ -12,6 +12,7 @@ class FilterConditionsV0(BaseModel):
     gte: Optional[Any] = None
     like: Optional[str] = None
     in_: Optional[List[Any]] = None
+    is_null: Optional[bool] = None
 
 
 class FiltersV0(RootModel):
