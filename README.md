@@ -30,6 +30,10 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.2.1
+
+- bump square_database_structure to >=2.5.8.
+
 ### v3.2.0
 
 - add support for is_null in FilterConditionsV0 model.

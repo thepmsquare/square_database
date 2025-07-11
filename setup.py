@@ -4,7 +4,7 @@ package_name = "square_database"
 
 setup(
     name=package_name,
-    version="3.2.0",
+    version="3.2.1",
     packages=find_packages(),
     package_data={
         package_name: ["data/*", "pydantic_models/*"],
@@ -23,7 +23,7 @@ setup(
     ],
     extras_require={
         "all": [
-            "square_database_structure>=2.5.6",
+            "square_database_structure>=2.5.8",
         ],
     },
     author="thePmSquare",
