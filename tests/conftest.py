@@ -1,8 +1,10 @@
 import importlib
 import os
+from datetime import datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
+from square_database_structure.square.public.enums import TestEnumEnum
 
 
 @pytest.fixture(scope="session")
@@ -142,6 +144,103 @@ def fixture_duplicate_insert_rows(create_client_and_cleanup):
         ],
         "skip_conflicts": True,
     }
+    client.post(
+        "/delete_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "filters": {},
+            "apply_filters": False,
+        },
+    )
+
+
+@pytest.fixture()
+def fixture_get_rows_with_filter(create_client_and_cleanup):
+    client = create_client_and_cleanup
+    client.post(
+        "/insert_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "data": [
+                {"test_text": "filtered_example"},
+                {"test_text": "another_example"},
+            ],
+        },
+    )
+    yield {
+        "database_name": "square",
+        "schema_name": "public",
+        "table_name": "test",
+        "filters": {"test_text": {"eq": "filtered_example"}},
+        "apply_filters": True,
+    }
+    client.post(
+        "/delete_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "filters": {},
+            "apply_filters": False,
+        },
+    )
+
+
+@pytest.fixture()
+def fixture_all_data_types(create_client_and_cleanup):
+    client = create_client_and_cleanup
+
+    now = datetime.now()
+    data_to_insert = [
+        {
+            "test_text": "alpha",
+            "test_datetime": (now - timedelta(days=10)).isoformat(),
+            "test_bool": True,
+            "test_enum_enum": TestEnumEnum.PENDING.value,
+            "test_float": 10.5,
+            "test_json": {"key": "value_1", "id": 1},
+        },
+        {
+            "test_text": "beta",
+            "test_datetime": (now - timedelta(days=5)).isoformat(),
+            "test_bool": False,
+            "test_enum_enum": TestEnumEnum.PENDING.value,
+            "test_float": 20.0,
+            "test_json": {"key": "value_2", "id": 2},
+        },
+        {
+            "test_text": "gamma",
+            "test_datetime": now.isoformat(),
+            "test_bool": True,
+            "test_enum_enum": TestEnumEnum.COMPLETED.value,
+            "test_float": 30.1,
+            "test_json": {"key": "value_3", "id": 3},
+        },
+        {
+            "test_text": "delta",
+            "test_datetime": (now + timedelta(days=5)).isoformat(),
+            "test_bool": False,
+            "test_enum_enum": TestEnumEnum.RUNNING.value,
+            "test_float": 40.99,
+            "test_json": {"key": "value_4", "id": 4},
+        },
+    ]
+
+    client.post(
+        "/insert_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "data": data_to_insert,
+        },
+    )
+    yield client
+
     client.post(
         "/delete_rows/v0",
         json={
