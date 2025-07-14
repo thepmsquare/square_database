@@ -30,6 +30,14 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.2.2 (in progress)
+
+- dependencies
+    - bump square_database_structure to >=2.5.9.
+- tests
+    - add tests for get_rows/v0 with filters.
+    - add drop_if_exists in create_client_and_cleanup when calling create_database_and_tables.
+
 ### v3.2.1
 
 - bump square_database_structure to >=2.5.8.

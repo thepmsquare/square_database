@@ -44,6 +44,7 @@ def create_client_and_cleanup(get_patched_configuration):
         db_port=get_patched_configuration.config_int_db_port,
         db_password=get_patched_configuration.config_str_db_password,
         db_ip=get_patched_configuration.config_str_db_ip,
+        drop_if_exists=True,
     )
     from square_database.main import (
         app,
