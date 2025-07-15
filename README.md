@@ -37,6 +37,7 @@ square_database\data\config.ini
 - tests
     - add tests for get_rows/v0 with filters.
     - add drop_if_exists in create_client_and_cleanup when calling create_database_and_tables.
+    - add tests for edit_rows/v0 with filters.
 
 ### v3.2.1
 

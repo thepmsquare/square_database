@@ -252,3 +252,40 @@ def fixture_all_data_types(create_client_and_cleanup):
             "apply_filters": False,
         },
     )
+
+
+@pytest.fixture()
+def fixture_edit_rows(create_client_and_cleanup):
+    client = create_client_and_cleanup
+
+    # insert a row to edit
+    client.post(
+        "/insert_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "data": [{"test_text": "to_edit"}],
+        },
+    )
+
+    yield {
+        "database_name": "square",
+        "schema_name": "public",
+        "table_name": "test",
+        "filters": {"test_text": {"eq": "to_edit"}},
+        "data": {"test_text": "edited"},
+        "apply_filters": True,
+    }
+
+    # cleanup
+    client.post(
+        "/delete_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "filters": {},
+            "apply_filters": False,
+        },
+    )

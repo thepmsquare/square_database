@@ -187,3 +187,31 @@ def test_filter_by_float_gte(fixture_all_data_types):
     assert len(data) == 2  # gamma, delta
     assert response.json()["data"]["total_count"] == 2
     assert all(item["test_float"] >= 30.0 for item in data)
+
+
+def test_edit_rows(create_client_and_cleanup, fixture_edit_rows):
+    client = create_client_and_cleanup
+
+    response = client.patch("/edit_rows/v0", json=fixture_edit_rows)
+    assert response.status_code == 200
+
+    response_json = response.json()
+    assert "data" in response_json
+    assert "affected_count" in response_json["data"]
+    assert response_json["data"]["affected_count"] >= 1
+
+    # verify edit applied
+    get_response = client.post(
+        "/get_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "filters": {"test_text": {"eq": "edited"}},
+            "apply_filters": True,
+        },
+    )
+    assert get_response.status_code == 200
+    data = get_response.json()["data"]["main"]
+    assert len(data) == 1
+    assert data[0]["test_text"] == "edited"
