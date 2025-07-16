@@ -215,3 +215,30 @@ def test_edit_rows(create_client_and_cleanup, fixture_edit_rows):
     data = get_response.json()["data"]["main"]
     assert len(data) == 1
     assert data[0]["test_text"] == "edited"
+
+
+def test_delete_rows(create_client_and_cleanup, fixture_delete_rows):
+    client = create_client_and_cleanup
+
+    response = client.post("/delete_rows/v0", json=fixture_delete_rows)
+    assert response.status_code == 200
+
+    response_json = response.json()
+    assert "data" in response_json
+    assert "affected_count" in response_json["data"]
+    assert response_json["data"]["affected_count"] >= 1
+
+    # verify deletion
+    get_response = client.post(
+        "/get_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "filters": {"test_text": {"eq": "to_delete"}},
+            "apply_filters": True,
+        },
+    )
+    assert get_response.status_code == 200
+    data = get_response.json()["data"]["main"]
+    assert len(data) == 0
