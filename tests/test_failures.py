@@ -1,6 +1,6 @@
-import pytest
 from fastapi import status
-from square_database_structure.square.public.enums import TestEnumEnum
+
+from square_database.messages import messages
 
 
 def test_insert_rows_invalid_database(create_client_and_cleanup):
@@ -16,7 +16,7 @@ def test_insert_rows_invalid_database(create_client_and_cleanup):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "INCORRECT_DATABASE_NAME" in response.json()["message"]
+    assert messages["INCORRECT_DATABASE_NAME"] in response.json()["message"]
 
 
 def test_insert_rows_invalid_schema(create_client_and_cleanup):
@@ -32,7 +32,7 @@ def test_insert_rows_invalid_schema(create_client_and_cleanup):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "INCORRECT_SCHEMA_NAME" in response.json()["message"]
+    assert messages["INCORRECT_SCHEMA_NAME"] in response.json()["message"]
 
 
 def test_insert_rows_invalid_table(create_client_and_cleanup):
@@ -48,7 +48,7 @@ def test_insert_rows_invalid_table(create_client_and_cleanup):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "INCORRECT_TABLE_NAME" in response.json()["message"]
+    assert messages["INCORRECT_TABLE_NAME"] in response.json()["message"]
 
 
 def test_insert_rows_invalid_data(create_client_and_cleanup):
@@ -64,7 +64,7 @@ def test_insert_rows_invalid_data(create_client_and_cleanup):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "GENERIC_400" in response.json()["message"]
+    assert messages["GENERIC_400"] in response.json()["message"]
 
 
 def test_get_rows_invalid_filter(create_client_and_cleanup):
@@ -81,7 +81,7 @@ def test_get_rows_invalid_filter(create_client_and_cleanup):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "GENERIC_400" in response.json()["message"]
+    assert messages["GENERIC_400"] in response.json()["message"]
 
 
 def test_get_rows_invalid_order_by(create_client_and_cleanup):
@@ -99,7 +99,7 @@ def test_get_rows_invalid_order_by(create_client_and_cleanup):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "GENERIC_400" in response.json()["message"]
+    assert messages["GENERIC_400"] in response.json()["message"]
 
 
 def test_edit_rows_invalid_data(create_client_and_cleanup, fixture_edit_rows):
@@ -129,7 +129,7 @@ def test_edit_rows_invalid_data(create_client_and_cleanup, fixture_edit_rows):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "GENERIC_400" in response.json()["message"]
+    assert messages["GENERIC_400"] in response.json()["message"]
 
 
 def test_edit_rows_invalid_filter_column(create_client_and_cleanup):
@@ -147,7 +147,7 @@ def test_edit_rows_invalid_filter_column(create_client_and_cleanup):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "GENERIC_400" in response.json()["message"]
+    assert messages["GENERIC_400"] in response.json()["message"]
 
 
 def test_delete_rows_invalid_filter_column(create_client_and_cleanup):
@@ -164,7 +164,7 @@ def test_delete_rows_invalid_filter_column(create_client_and_cleanup):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "GENERIC_400" in response.json()["message"]
+    assert messages["GENERIC_400"] in response.json()["message"]
 
 
 def test_invalid_enum_value(create_client_and_cleanup):
@@ -180,4 +180,4 @@ def test_invalid_enum_value(create_client_and_cleanup):
         },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "GENERIC_400" in response.json()["message"]
+    assert messages["GENERIC_400"] in response.json()["message"]
