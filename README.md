@@ -32,6 +32,8 @@ square_database\data\config.ini
 
 ### v3.2.2 (in progress)
 
+- main
+    - add proper validation for INCORRECT_SCHEMA_NAME in all CRUD endpoints.
 - dependencies
     - bump square_database_structure to >=2.5.9.
 - tests

@@ -73,20 +73,26 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
         # Connect to database
         with database_engine.connect() as database_connection:
             # ===========================================
-            try:
-                # Connect to schema
-                database_connection.execute(
-                    text(f"SET search_path TO {insert_rows_model.schema_name}")
-                )
-                # ===========================================
-            except OperationalError as oe:
+            # check if schema exists
+            schema_result = database_connection.execute(
+                text(
+                    "SELECT schema_name FROM information_schema.schemata WHERE schema_name = :schema"
+                ),
+                {"schema": insert_rows_model.schema_name},
+            ).scalar()
+
+            if not schema_result:
                 output_content = get_api_output_in_standard_format(
-                    message=messages["INCORRECT_SCHEMA_NAME"], log=str(oe)
+                    message=messages["INCORRECT_SCHEMA_NAME"]
                 )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=output_content,
                 )
+            # connect to schema
+            database_connection.execute(
+                text(f"SET search_path TO {insert_rows_model.schema_name}")
+            )
             try:
                 table_class_name = snake_to_capital_camel(insert_rows_model.table_name)
                 table_module_path = (
@@ -189,20 +195,29 @@ async def get_rows_v0(get_rows_model: GetRowsV0):
         # Connect to the database
         with database_engine.connect() as database_connection:
             # ===========================================
-            try:
-                # Connect to schema
-                database_connection.execute(
-                    text(f"SET search_path TO {get_rows_model.schema_name}")
-                )
-                # ===========================================
 
-            except OperationalError as oe:
+            # check if schema exists
+            schema_result = database_connection.execute(
+                text(
+                    "SELECT schema_name FROM information_schema.schemata WHERE schema_name = :schema"
+                ),
+                {"schema": get_rows_model.schema_name},
+            ).scalar()
+
+            if not schema_result:
                 output_content = get_api_output_in_standard_format(
-                    message=messages["INCORRECT_SCHEMA_NAME"], log=str(oe)
+                    message=messages["INCORRECT_SCHEMA_NAME"]
                 )
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=output_content,
                 )
+
+            # connect to schema
+            database_connection.execute(
+                text(f"SET search_path TO {get_rows_model.schema_name}")
+            )
+            # ===========================================
 
             # Dynamically import table module and class
             try:
@@ -325,21 +340,28 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
         # Connect to database
         with database_engine.connect() as database_connection:
             # ===========================================
-            try:
-                # Connect to schema
-                database_connection.execute(
-                    text(f"SET search_path TO {edit_rows_model.schema_name}")
-                )
-                # ===========================================
+            # check if schema exists
+            schema_result = database_connection.execute(
+                text(
+                    "SELECT schema_name FROM information_schema.schemata WHERE schema_name = :schema"
+                ),
+                {"schema": edit_rows_model.schema_name},
+            ).scalar()
 
-            except OperationalError as oe:
+            if not schema_result:
                 output_content = get_api_output_in_standard_format(
-                    message=messages["INCORRECT_SCHEMA_NAME"], log=str(oe)
+                    message=messages["INCORRECT_SCHEMA_NAME"]
                 )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=output_content,
                 )
+
+            # connect to schema
+            database_connection.execute(
+                text(f"SET search_path TO {edit_rows_model.schema_name}")
+            )
+            # ===========================================
             try:
                 table_class_name = snake_to_capital_camel(edit_rows_model.table_name)
                 table_module_path = (
@@ -446,21 +468,26 @@ async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
         # Connect to database
         with database_engine.connect() as database_connection:
             # ===========================================
-            try:
-                # Connect to schema
-                database_connection.execute(
-                    text(f"SET search_path TO {delete_rows_model.schema_name}")
-                )
-                # ===========================================
+            # check if schema exists
+            schema_result = database_connection.execute(
+                text(
+                    "SELECT schema_name FROM information_schema.schemata WHERE schema_name = :schema"
+                ),
+                {"schema": delete_rows_model.schema_name},
+            ).scalar()
 
-            except OperationalError as oe:
+            if not schema_result:
                 output_content = get_api_output_in_standard_format(
-                    message=messages["INCORRECT_SCHEMA_NAME"], log=str(oe)
+                    message=messages["INCORRECT_SCHEMA_NAME"]
                 )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=output_content,
                 )
+            # connect to schema
+            database_connection.execute(
+                text(f"SET search_path TO {delete_rows_model.schema_name}")
+            )
             try:
                 table_class_name = snake_to_capital_camel(delete_rows_model.table_name)
                 table_module_path = (
