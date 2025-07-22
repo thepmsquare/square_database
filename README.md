@@ -30,10 +30,11 @@ square_database\data\config.ini
 
 ## changelog
 
-### v3.2.2 (in progress)
+### v3.2.2
 
 - main
     - add proper validation for INCORRECT_SCHEMA_NAME in all CRUD endpoints.
+    - add proper validation for incorrect column name in edit rows data parameter.
 - dependencies
     - bump square_database_structure to >=2.5.9.
 - tests

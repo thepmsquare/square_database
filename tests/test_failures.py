@@ -181,3 +181,19 @@ def test_invalid_enum_value(create_client_and_cleanup):
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert messages["GENERIC_400"] in response.json()["message"]
+
+
+def test_invalid_column_insert(create_client_and_cleanup):
+    """Test inserting rows with an invalid column name"""
+    client = create_client_and_cleanup
+    response = client.post(
+        "/insert_rows/v0",
+        json={
+            "database_name": "square",
+            "schema_name": "public",
+            "table_name": "test",
+            "data": [{"invalid_column": "example"}],
+        },
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert messages["GENERIC_400"] in response.json()["message"]

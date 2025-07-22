@@ -7,7 +7,7 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
@@ -378,6 +378,18 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=output_content,
                 )
+            # validate the column names in the edit_rows_model.data
+            mapper = inspect(table_class)
+            valid_column_names = {col.key for col in mapper.columns}
+            for key in edit_rows_model.data.keys():
+                if key not in valid_column_names:
+                    output_content = get_api_output_in_standard_format(
+                        message=messages["GENERIC_400"],
+                        log=f"Invalid column '{key}' for table '{table_class.__tablename__}'. Valid columns are: {', '.join(valid_column_names)}",
+                    )
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST, detail=output_content
+                    )
             local_object_session = sessionmaker(bind=database_engine)
             session = local_object_session()
             try:
