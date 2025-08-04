@@ -30,6 +30,12 @@ square_database\data\config.ini
 
 ## changelog
 
+### v3.2.3
+
+- dependencies
+    - add square and dev sections.
+    - add pytest-cov>=6.2.1.
+
 ### v3.2.2
 
 - main
