@@ -34,7 +34,7 @@ setup(
             "square_database_structure>=2.6.0",
         ],
     },
-    author="thePmSquare",
+    author="Parth Mukesh Mangtani",
     author_email="thepmsquare@gmail.com",
     description="database layer for my personal server.",
     long_description=open("README.md", "r", encoding="utf-8").read(),
