@@ -4,10 +4,10 @@ package_name = "square_database"
 
 setup(
     name=package_name,
-    version="3.2.3",
+    version="3.3.0",
     packages=find_packages(),
     package_data={
-        package_name: ["data/*", "pydantic_models/*"],
+        package_name: ["data/*", "models/*"],
     },
     install_requires=[
         "sqlalchemy>=2.0.23",
@@ -31,20 +31,24 @@ setup(
             "pytest-cov>=6.2.1",
         ],
         "square": [
-            "square_database_structure>=2.5.9",
+            "square_database_structure>=2.6.0",
         ],
     },
     author="thePmSquare",
     author_email="thepmsquare@gmail.com",
     description="database layer for my personal server.",
-    long_description=open("README.md", "r").read(),
+    long_description=open("README.md", "r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     url=f"https://github.com/thepmsquare/{package_name}",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3 :: Only",
+        "Topic :: Database",
+        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
 )

@@ -1,3 +1,5 @@
+from enum import Enum
+
 from square_database.configuration import global_object_square_logger
 
 
@@ -62,3 +64,9 @@ def apply_filters(query, filters_root, table_class):
         return query
     except Exception:
         raise
+
+
+def enum_fallback_serializer(obj):
+    if isinstance(obj, Enum):
+        return obj.value
+    return str(obj)
