@@ -49,6 +49,7 @@ setup(
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3 :: Only",
         "Topic :: Database",
-        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+        "Framework :: FastAPI",
     ],
 )
