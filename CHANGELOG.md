@@ -1,5 +1,12 @@
 # changelog
 
+## v3.3.1
+
+- env
+    - SQUARE_LOGGER -> FORMATTER_CHOICE
+- dependencies
+    - square_logger>=3.0.0.
+
 ## v3.3.0
 
 - update project folder structure.
