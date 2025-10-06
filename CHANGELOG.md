@@ -1,5 +1,11 @@
 # changelog
 
+## v3.3.2
+
+- remove setup.py and switch to pyproject.toml.
+- dependencies
+    - square_logger>=3.0.1.
+
 ## v3.3.1
 
 - env
