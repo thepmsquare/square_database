@@ -5,7 +5,7 @@ FROM python:3.12-slim AS base
 WORKDIR /app
 
 # copy only requirements first for caching
-COPY pyproject.toml setup.cfg /app/
+COPY pyproject.toml /app/
 # optional: if you have requirements.txt, copy that too
 
 # install build dependencies first (isolated)
