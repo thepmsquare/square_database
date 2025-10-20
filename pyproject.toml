@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "square_database"
-version = "3.3.3"
+version = "3.3.4"
 description = "database layer for my personal server."
 readme = "README.md"
 requires-python = ">=3.12"

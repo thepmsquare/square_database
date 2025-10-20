@@ -1,6 +1,10 @@
 # changelog
 
-## v3.3.3
+## v3.3.4
+
+- bugfix in dockerfile
+
+## v3.3.3 (unstable)
 
 - switch build-system to uv.
 - update pytest github action.
