@@ -1,12 +1,9 @@
-FROM python:3.12-slim
-
+FROM ghcr.io/astral-sh/uv:python3.12-trixie-slim
+WORKDIR /app
 COPY . /app
 
-WORKDIR /app
+# create a clean environment from lockfile (preferred: use --locked)
+RUN uv sync --locked
 
-RUN pip install .["all"]
-
-CMD ["python3", "/usr/local/lib/python3.12/site-packages/square_database/main.py"]
-
-# Uncomment for debugging
-# CMD ["bash", "-c", "while true; do sleep 60; done"]
+# run via the environment uv created (or use uv run)
+CMD ["uv", "run", "--", "python", "-m", "square_database.main"]

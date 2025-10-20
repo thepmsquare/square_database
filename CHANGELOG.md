@@ -1,9 +1,11 @@
 # changelog
 
-## v3.3.3 (in progress)
+## v3.3.3
 
 - switch build-system to uv.
-- update pytest github actions.
+- update pytest github action.
+- update pypi publish github action.
+- update Dockerfile to use uv.
 
 ## v3.3.2
 
