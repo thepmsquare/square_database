@@ -1,5 +1,10 @@
 # changelog
 
+## v3.3.3 (in progress)
+
+- switch build-system to uv.
+- update pytest github actions.
+
 ## v3.3.2
 
 - remove setup.py and switch to pyproject.toml.
