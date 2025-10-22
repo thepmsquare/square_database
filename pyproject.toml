@@ -46,3 +46,4 @@ classifiers = [
 [tool.uv.build-backend]
 module-name = "square_database"
 module-root = ""
+source-include = ["square_database/data/*"]
