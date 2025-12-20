@@ -2,6 +2,7 @@ from fastapi import status, APIRouter
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from square_commons import get_api_output_in_standard_format
+from square_commons.api_utils import StandardResponse
 
 from square_database.configuration import (
     global_object_square_logger,
@@ -12,6 +13,7 @@ from square_database.models.core import (
     EditRowsV0,
     GetRowsV0,
     InsertRowsV0,
+    InsertRowsV0Response,
 )
 from square_database.utils.routes.core import (
     util_insert_rows_v0,
@@ -25,7 +27,11 @@ router = APIRouter(
 )
 
 
-@router.post("/insert_rows/v0", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/insert_rows/v0",
+    status_code=status.HTTP_201_CREATED,
+    response_model=StandardResponse[InsertRowsV0Response],
+)
 @global_object_square_logger.auto_logger()
 async def insert_rows_v0(insert_rows_model: InsertRowsV0):
     try:

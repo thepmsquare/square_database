@@ -1,5 +1,13 @@
 # changelog
 
+## v3.4.0 (in progress)
+
+- add InsertRowsV0Response.
+- add response_model to the following
+    - insert_rows_v0.
+- dependencies
+    - update "square_commons>=3.1.0"
+
 ## v3.3.4
 
 - bugfix in dockerfile

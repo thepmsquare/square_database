@@ -9,7 +9,6 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from square_commons import get_api_output_in_standard_format
-
 from square_database.configuration import (
     config_int_db_port,
     config_str_database_module_name,
@@ -112,10 +111,11 @@ def util_insert_rows_v0(insert_rows_model):
                 output_content = get_api_output_in_standard_format(
                     message=messages["CREATE_SUCCESSFUL"],
                     data={"main": return_this, "affected_count": len(return_this)},
+                    as_dict=False
                 )
                 return JSONResponse(
                     status_code=status.HTTP_201_CREATED,
-                    content=output_content,
+                    content=output_content.model_dump(),
                 )
             except Exception as e:
                 session.rollback()
