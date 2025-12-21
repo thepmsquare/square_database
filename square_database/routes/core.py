@@ -14,6 +14,7 @@ from square_database.models.core import (
     GetRowsV0,
     InsertRowsV0,
     InsertRowsV0Response,
+    GetRowsV0Response,
 )
 from square_database.utils.routes.core import (
     util_insert_rows_v0,
@@ -49,7 +50,11 @@ async def insert_rows_v0(insert_rows_model: InsertRowsV0):
         )
 
 
-@router.post("/get_rows/v0", status_code=status.HTTP_200_OK)
+@router.post(
+    "/get_rows/v0",
+    status_code=status.HTTP_200_OK,
+    response_model=StandardResponse[GetRowsV0Response],
+)
 @global_object_square_logger.auto_logger()
 async def get_rows_v0(get_rows_model: GetRowsV0):
     try:

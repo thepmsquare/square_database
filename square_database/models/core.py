@@ -26,10 +26,12 @@ class InsertRowsV0(BaseModel):
     data: conlist(Dict[str, Any], min_length=1)
     skip_conflicts: bool = False
 
+
 class InsertRowsV0Response(BaseModel):
     main: List[Dict[str, Any]]
     affected_count: int
-    
+
+
 class GetRowsV0(BaseModel):
     database_name: str
     table_name: str
@@ -40,6 +42,11 @@ class GetRowsV0(BaseModel):
     order_by: List[str] = Field(default_factory=list)
     limit: Optional[int] = None
     offset: int = 0
+
+
+class GetRowsV0Response(BaseModel):
+    main: List[Dict[str, Any]]
+    total_count: int
 
 
 class EditRowsV0(BaseModel):

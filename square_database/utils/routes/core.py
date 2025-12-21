@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from square_commons import get_api_output_in_standard_format
+
 from square_database.configuration import (
     config_int_db_port,
     config_str_database_module_name,
@@ -18,6 +19,7 @@ from square_database.configuration import (
     global_object_square_logger,
 )
 from square_database.messages import messages
+from square_database.models.core import InsertRowsV0Response, GetRowsV0Response
 from square_database.utils.common_operations import (
     snake_to_capital_camel,
     enum_fallback_serializer,
@@ -108,10 +110,13 @@ def util_insert_rows_v0(insert_rows_model):
                     )
                 )
                 session.close()
+                data_pydantic = InsertRowsV0Response(
+                    main=return_this, affected_count=len(return_this)
+                )
                 output_content = get_api_output_in_standard_format(
                     message=messages["CREATE_SUCCESSFUL"],
-                    data={"main": return_this, "affected_count": len(return_this)},
-                    as_dict=False
+                    data=data_pydantic.model_dump(),
+                    as_dict=False,
                 )
                 return JSONResponse(
                     status_code=status.HTTP_201_CREATED,
@@ -236,21 +241,23 @@ def util_get_rows_v0(get_rows_model):
                     }
                     for x in filtered_rows
                 ]
+                data_pydantic = GetRowsV0Response(
+                    main=json.loads(
+                        json.dumps(
+                            local_list_filtered_rows,
+                            default=enum_fallback_serializer,
+                        )
+                    ),
+                    total_count=total_count,
+                )
                 output_content = get_api_output_in_standard_format(
                     message=messages["READ_SUCCESSFUL"],
-                    data={
-                        "main": json.loads(
-                            json.dumps(
-                                local_list_filtered_rows,
-                                default=enum_fallback_serializer,
-                            )
-                        ),
-                        "total_count": total_count,
-                    },
+                    data=data_pydantic.model_dump(),
+                    as_dict=False,
                 )
                 return JSONResponse(
                     status_code=status.HTTP_200_OK,
-                    content=output_content,
+                    content=output_content.model_dump(),
                 )
 
             except Exception as e:

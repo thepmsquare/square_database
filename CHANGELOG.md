@@ -2,9 +2,12 @@
 
 ## v3.4.0 (in progress)
 
-- add InsertRowsV0Response.
+- models
+    - add InsertRowsV0Response.
+    - add GetRowsV0Response.
 - add response_model to the following
     - insert_rows_v0.
+    - get_rows_v0.
 - dependencies
     - update "square_commons>=3.1.0"
 
