@@ -19,7 +19,12 @@ from square_database.configuration import (
     global_object_square_logger,
 )
 from square_database.messages import messages
-from square_database.models.core import InsertRowsV0Response, GetRowsV0Response
+from square_database.models.core import (
+    InsertRowsV0Response,
+    GetRowsV0Response,
+    EditRowsV0Response,
+    DeleteRowsV0Response,
+)
 from square_database.utils.common_operations import (
     snake_to_capital_camel,
     enum_fallback_serializer,
@@ -381,15 +386,16 @@ def util_edit_rows_v0(edit_rows_model):
                         local_list_filtered_rows, default=enum_fallback_serializer
                     )
                 )
+                data_pydantic = EditRowsV0Response(
+                    main=return_this, affected_count=len(return_this)
+                )
                 output_content = get_api_output_in_standard_format(
                     message=messages["UPDATE_SUCCESSFUL"],
-                    data={
-                        "main": return_this,
-                        "affected_count": len(return_this),
-                    },
+                    data=data_pydantic.model_dump(),
+                    as_dict=False,
                 )
                 return JSONResponse(
-                    status_code=status.HTTP_200_OK, content=output_content
+                    status_code=status.HTTP_200_OK, content=output_content.model_dump()
                 )
             except Exception as e:
                 session.rollback()
@@ -495,12 +501,16 @@ def util_delete_rows_v0(delete_rows_model):
                         local_list_filtered_rows, default=enum_fallback_serializer
                     )
                 )
+                data_pydantic = DeleteRowsV0Response(
+                    main=return_this, affected_count=len(return_this)
+                )
                 output_content = get_api_output_in_standard_format(
                     message=messages["DELETE_SUCCESSFUL"],
-                    data={"main": return_this, "affected_count": len(return_this)},
+                    data=data_pydantic.model_dump(),
+                    as_dict=False,
                 )
                 return JSONResponse(
-                    status_code=status.HTTP_200_OK, content=output_content
+                    status_code=status.HTTP_200_OK, content=output_content.model_dump()
                 )
             except Exception as e:
                 # no need for this but kept it anyway :/

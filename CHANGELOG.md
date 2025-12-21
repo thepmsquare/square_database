@@ -1,13 +1,17 @@
 # changelog
 
-## v3.4.0 (in progress)
+## v3.4.0
 
 - models
     - add InsertRowsV0Response.
     - add GetRowsV0Response.
+    - add EditRowsV0Response.
+    - add DeleteRowsV0Response.
 - add response_model to the following
     - insert_rows_v0.
     - get_rows_v0.
+    - edit_rows_v0.
+    - delete_rows_v0.
 - dependencies
     - update "square_commons>=3.1.0"
 

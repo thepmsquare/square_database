@@ -15,6 +15,8 @@ from square_database.models.core import (
     InsertRowsV0,
     InsertRowsV0Response,
     GetRowsV0Response,
+    EditRowsV0Response,
+    DeleteRowsV0Response,
 )
 from square_database.utils.routes.core import (
     util_insert_rows_v0,
@@ -72,7 +74,11 @@ async def get_rows_v0(get_rows_model: GetRowsV0):
         )
 
 
-@router.patch("/edit_rows/v0", status_code=status.HTTP_200_OK)
+@router.patch(
+    "/edit_rows/v0",
+    status_code=status.HTTP_200_OK,
+    response_model=StandardResponse[EditRowsV0Response],
+)
 @global_object_square_logger.auto_logger()
 async def edit_rows_v0(edit_rows_model: EditRowsV0):
     try:
@@ -90,7 +96,11 @@ async def edit_rows_v0(edit_rows_model: EditRowsV0):
         )
 
 
-@router.post("/delete_rows/v0", status_code=status.HTTP_200_OK)
+@router.post(
+    "/delete_rows/v0",
+    status_code=status.HTTP_200_OK,
+    response_model=StandardResponse[DeleteRowsV0Response],
+)
 @global_object_square_logger.auto_logger()
 async def delete_rows_v0(delete_rows_model: DeleteRowsV0):
     try:

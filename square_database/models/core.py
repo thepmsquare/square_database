@@ -58,9 +58,19 @@ class EditRowsV0(BaseModel):
     apply_filters: bool = True
 
 
+class EditRowsV0Response(BaseModel):
+    main: List[Dict[str, Any]]
+    affected_count: int
+
+
 class DeleteRowsV0(BaseModel):
     database_name: str
     table_name: str
     schema_name: str
     filters: FiltersV0
     apply_filters: bool = True
+
+
+class DeleteRowsV0Response(BaseModel):
+    main: List[Dict[str, Any]]
+    affected_count: int
