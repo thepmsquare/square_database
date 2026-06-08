@@ -1,4 +1,5 @@
 import os.path
+import tomllib
 
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,7 +24,15 @@ from square_database.configuration import (
 )
 from square_database.routes import core
 
-app = FastAPI()
+with open(
+    os.path.join(
+        str(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "pyproject.toml",
+    ),
+    "rb",
+) as f:
+    version = tomllib.load(f)["project"]["version"]
+app = FastAPI(title=config_str_module_name, version=version)
 
 app.add_middleware(
     CORSMiddleware,

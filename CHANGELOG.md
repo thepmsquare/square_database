@@ -1,5 +1,9 @@
 # changelog
 
+## v3.4.1
+
+- update app title and version in fastapi.
+
 ## v3.4.0
 
 - models
